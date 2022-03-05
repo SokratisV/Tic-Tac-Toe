@@ -18,7 +18,7 @@ namespace TicTacToe.Gameplay
             AddTopLeftDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             AddBottomRightDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             if (IsValueIncludedEnoughTimes(valuesInDiagonal, value, amountRequired)) return true;
-            
+
             //Second diagonal (bottom left -> top right)
             valuesInDiagonal.Clear();
             AddBottomLeftDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
@@ -32,6 +32,7 @@ namespace TicTacToe.Gameplay
             foreach (var i in values)
             {
                 if (i == value) count++;
+                else count = 0;
                 if (count == amountRequired) return true;
             }
 

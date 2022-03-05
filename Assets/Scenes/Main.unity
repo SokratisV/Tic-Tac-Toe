@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 1165159052}
   - component: {fileID: 1165159051}
   m_Layer: 0
-  m_Name: Boostrap
+  m_Name: Bootstrap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -158,8 +158,6 @@ MonoBehaviour:
     sceneIndex: 2
     sceneEnabled: 1
   cameraPrefab: {fileID: 4010072671314034084, guid: 570cb0c38ee05e54091ebc1520aeb9ae, type: 3}
-  gameData: {fileID: 11400000, guid: 8b85273c5c5834548941074c95358407, type: 2}
-  check: {fileID: 11400000, guid: 7372b1b72e2e26049a1a4659ea26da49, type: 2}
 --- !u!4 &1165159052
 Transform:
   m_ObjectHideFlags: 0
