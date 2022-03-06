@@ -14,6 +14,7 @@ namespace TicTacToe.Gameplay
         private readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of having X,O
         private readonly WinConditionCheck[] _winConditions;
         private int _currentPlayerIndex;
+        private bool _hasGameEnded;
 
         public int BoardSize => _board.Length;
         public int CurrentPlayerIndex => _currentPlayerIndex;
@@ -32,23 +33,9 @@ namespace TicTacToe.Gameplay
             OnBoardUpdatedInternal += CheckForWinner;
         }
 
-        private void CheckForWinner(int value, int[,] board, (int x, int y) coords)
-        {
-            foreach (var condition in _winConditions)
-            {
-                if (condition.Check(value, board, coords))
-                {
-                    OnGameEnd?.Invoke(_currentPlayerIndex);
-                    Debug.Log($"Player {_currentPlayerIndex} won!");
-                    return;
-                }
-            }
-
-            NextPlayer();
-        }
-
         public int BoardUpdate(int index)
         {
+            if (_hasGameEnded) return 0;
             var x = index % _boardWidth;
             var y = index / _boardWidth;
             var value = _perPlayerValue[_currentPlayerIndex];
@@ -56,6 +43,22 @@ namespace TicTacToe.Gameplay
             OnBoardUpdated?.Invoke(_board);
             OnBoardUpdatedInternal?.Invoke(value, _board, (x, y));
             return value;
+        }
+
+        private void CheckForWinner(int value, int[,] board, (int x, int y) coords)
+        {
+            foreach (var condition in _winConditions)
+            {
+                if (condition.Check(value, board, coords))
+                {
+                    OnGameEnd?.Invoke(_currentPlayerIndex);
+                    _hasGameEnded = true;
+                    Debug.Log($"Player {_currentPlayerIndex} won!");
+                    return;
+                }
+            }
+
+            NextPlayer();
         }
 
         private void NextPlayer()

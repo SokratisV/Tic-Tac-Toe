@@ -11,33 +11,45 @@ namespace TicTacToe.Gameplay
         [SerializeField] private GameData _gameData;
         [SerializeField] private GridLayoutGroup gridUi;
         [SerializeField] private Button quit;
-        [SerializeField] private Button buttonPrefab;
+        [SerializeField] private BoardButton buttonPrefab;
+        [SerializeField] private TextMeshProUGUI playerTurn;
+        [SerializeField] private Sprite[] _perPlayerSprite; //translates GameLoop's internal player "values" to sprites
 
         private GameLoop _gameLoop;
 
         private void Awake()
         {
+            if (_perPlayerSprite.Length < _gameData.NumberOfPlayers)
+            {
+                Debug.LogError("Player sprites do not have enough elements for every player.");
+                mainMenu.LoadScene();
+                return;
+            }
+
             quit.onClick.AddListener(() => mainMenu.LoadScene());
             _gameLoop = new GameLoop(_gameData);
-            GenerateButtons(_gameLoop.BoardSize, _gameData.BoardWidth, buttonPrefab, gridUi);
+            GenerateBoardGrid(_gameLoop.BoardSize, _gameData.BoardWidth, buttonPrefab, gridUi);
+            SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
         }
 
-        private void GenerateButtons(int boardSize, int gridWidth, Button prefab, GridLayoutGroup grid)
+        private void SetCurrentPlayerText(int playerIndex) => playerTurn.SetText($"Player {playerIndex}");
+
+        private void GenerateBoardGrid(int boardSize, int gridWidth, BoardButton prefab, GridLayoutGroup grid)
         {
             grid.constraintCount = gridWidth;
             var gridParent = grid.transform;
             for (var i = 0; i < boardSize; i++)
             {
                 var button = Instantiate(prefab, gridParent);
-                var gridIndex = i;
-                button.onClick.AddListener(() => OnButtonClick(button, gridIndex));
+                button.AddListener(() => OnButtonClick(button));
             }
         }
 
-        private void OnButtonClick(Button button, int gridIndex)
+        private void OnButtonClick(BoardButton button)
         {
-            var value = _gameLoop.BoardUpdate(gridIndex);
-            button.GetComponentInChildren<TextMeshProUGUI>().SetText(value.ToString());
+            button.SetImage(_perPlayerSprite[_gameLoop.CurrentPlayerIndex]);
+            button.Toggle(false);
+            SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
         }
     }
 }
