@@ -41,14 +41,17 @@ namespace TicTacToe.Gameplay
             for (var i = 0; i < boardSize; i++)
             {
                 var button = Instantiate(prefab, gridParent);
-                button.AddListener(() => OnButtonClick(button));
+                var gridIndex = i;
+                button.AddListener(() => OnButtonClick(button, gridIndex));
+                _gameLoop.OnGameEnd += _ => button.Toggle(false);
             }
         }
 
-        private void OnButtonClick(BoardButton button)
+        private void OnButtonClick(BoardButton button, int gridIndex)
         {
             button.SetImage(_perPlayerSprite[_gameLoop.CurrentPlayerIndex]);
             button.Toggle(false);
+            _gameLoop.BoardUpdate(gridIndex);
             SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
         }
     }

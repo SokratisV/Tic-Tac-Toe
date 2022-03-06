@@ -15,12 +15,14 @@ namespace TicTacToe.Gameplay
 
             var valuesInDiagonal = new List<int>();
             //First diagonal (top left -> bottom right)
+            valuesInDiagonal.Add(board[coords.x, coords.y]);
             AddTopLeftDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             AddBottomRightDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             if (IsValueIncludedEnoughTimes(valuesInDiagonal, value, amountRequired)) return true;
 
             //Second diagonal (bottom left -> top right)
             valuesInDiagonal.Clear();
+            valuesInDiagonal.Add(board[coords.x, coords.y]);
             AddBottomLeftDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             AddTopRightDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             return IsValueIncludedEnoughTimes(valuesInDiagonal, value, amountRequired);
@@ -42,6 +44,8 @@ namespace TicTacToe.Gameplay
         private static void AddTopLeftDiagonalValuesToCollection(int[,] board, int initialXValue, int maxRowNumber, int initialYValue, int maxColumnNumber,
             ICollection<int> values)
         {
+            initialXValue--;
+            initialYValue--;
             while (IsWithinBounds(initialXValue, 0, maxRowNumber) && IsWithinBounds(initialYValue, 0, maxColumnNumber))
             {
                 values.Add(board[initialXValue, initialYValue]);
@@ -53,6 +57,8 @@ namespace TicTacToe.Gameplay
         private static void AddBottomRightDiagonalValuesToCollection(int[,] board, int initialXValue, int maxRowNumber, int initialYValue, int maxColumnNumber,
             ICollection<int> values)
         {
+            initialXValue++;
+            initialYValue++;
             while (IsWithinBounds(initialXValue, 0, maxRowNumber) && IsWithinBounds(initialYValue, 0, maxColumnNumber))
             {
                 values.Add(board[initialXValue, initialYValue]);
@@ -64,6 +70,8 @@ namespace TicTacToe.Gameplay
         private static void AddBottomLeftDiagonalValuesToCollection(int[,] board, int initialXValue, int maxRowNumber, int initialYValue, int maxColumnNumber,
             ICollection<int> values)
         {
+            initialXValue++;
+            initialYValue--;
             while (IsWithinBounds(initialXValue, 0, maxRowNumber) && IsWithinBounds(initialYValue, 0, maxColumnNumber))
             {
                 values.Add(board[initialXValue, initialYValue]);
@@ -75,6 +83,8 @@ namespace TicTacToe.Gameplay
         private static void AddTopRightDiagonalValuesToCollection(int[,] board, int initialXValue, int maxRowNumber, int initialYValue, int maxColumnNumber,
             ICollection<int> values)
         {
+            initialXValue--;
+            initialYValue++;
             while (IsWithinBounds(initialXValue, 0, maxRowNumber) && IsWithinBounds(initialYValue, 0, maxColumnNumber))
             {
                 values.Add(board[initialXValue, initialYValue]);

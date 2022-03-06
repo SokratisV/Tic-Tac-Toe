@@ -33,16 +33,15 @@ namespace TicTacToe.Gameplay
             OnBoardUpdatedInternal += CheckForWinner;
         }
 
-        public int BoardUpdate(int index)
+        public void BoardUpdate(int index)
         {
-            if (_hasGameEnded) return 0;
+            if (_hasGameEnded) return;
             var x = index % _boardWidth;
             var y = index / _boardWidth;
             var value = _perPlayerValue[_currentPlayerIndex];
             _board[x, y] = value;
             OnBoardUpdated?.Invoke(_board);
             OnBoardUpdatedInternal?.Invoke(value, _board, (x, y));
-            return value;
         }
 
         private void CheckForWinner(int value, int[,] board, (int x, int y) coords)
