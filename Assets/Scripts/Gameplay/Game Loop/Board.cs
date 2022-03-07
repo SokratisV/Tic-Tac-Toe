@@ -10,8 +10,6 @@ namespace TicTacToe.Gameplay
         private readonly int _boardWidth;
         private readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of being bound to X,O, etc
 
-        public int BoardSize => _board.Length;
-
         public Board(GameData data)
         {
             _boardWidth = data.BoardWidth;
