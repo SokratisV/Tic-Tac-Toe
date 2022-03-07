@@ -10,5 +10,8 @@ namespace TicTacToe
         [Min(3)] public int BoardWidth = 3;
         [Min(3)] public int BoardHeight = 3;
         public WinConditionCheck[] WinConditions;
+
+        public GameMode GameMode { get; set; }
+        public AiDifficulty Difficulty { get; set; }
     }
 }

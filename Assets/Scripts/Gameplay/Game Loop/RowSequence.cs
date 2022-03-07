@@ -7,7 +7,7 @@ namespace TicTacToe.Gameplay
     {
         [SerializeField, Min(1)] private int amountRequired = 1;
 
-        public override bool Check(int value, int[,] board, (int x, int y) coords)
+        public override bool Check(int playerRepresentingValue, int[,] board, (int x, int y) coords)
         {
             var row = coords.x;
             var numberOfColumns = board.GetLength(1);
@@ -15,7 +15,7 @@ namespace TicTacToe.Gameplay
             var count = 0;
             for (var j = 0; j < numberOfColumns; j++)
             {
-                if (board[row, j] == value) count++;
+                if (board[row, j] == playerRepresentingValue) count++;
                 else count = 0;
                 if (count == amountRequired) return true;
             }

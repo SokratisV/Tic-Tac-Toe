@@ -8,7 +8,7 @@ namespace TicTacToe.Gameplay
     {
         [SerializeField, Min(1)] private int amountRequired = 1;
 
-        public override bool Check(int value, int[,] board, (int x, int y) coords)
+        public override bool Check(int playerRepresentingValue, int[,] board, (int x, int y) coords)
         {
             var numberOfRows = board.GetLength(0);
             var numberOfColumns = board.GetLength(1);
@@ -18,14 +18,14 @@ namespace TicTacToe.Gameplay
             valuesInDiagonal.Add(board[coords.x, coords.y]);
             AddTopLeftDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             AddBottomRightDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
-            if (IsValueIncludedEnoughTimes(valuesInDiagonal, value, amountRequired)) return true;
+            if (IsValueIncludedEnoughTimes(valuesInDiagonal, playerRepresentingValue, amountRequired)) return true;
 
             //Second diagonal (bottom left -> top right)
             valuesInDiagonal.Clear();
             valuesInDiagonal.Add(board[coords.x, coords.y]);
             AddBottomLeftDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
             AddTopRightDiagonalValuesToCollection(board, coords.x, numberOfRows, coords.y, numberOfColumns, valuesInDiagonal);
-            return IsValueIncludedEnoughTimes(valuesInDiagonal, value, amountRequired);
+            return IsValueIncludedEnoughTimes(valuesInDiagonal, playerRepresentingValue, amountRequired);
         }
 
         private static bool IsValueIncludedEnoughTimes(IEnumerable<int> values, int value, int amountRequired)

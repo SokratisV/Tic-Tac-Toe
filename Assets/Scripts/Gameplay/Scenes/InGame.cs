@@ -8,18 +8,18 @@ namespace TicTacToe.Gameplay
     public class InGame : MonoBehaviour
     {
         [SerializeField] private SceneReference mainMenu;
-        [SerializeField] private GameData _gameData;
+        [SerializeField] private GameData gameData;
         [SerializeField] private GridLayoutGroup gridUi;
         [SerializeField] private Button quit;
         [SerializeField] private BoardButton buttonPrefab;
         [SerializeField] private TextMeshProUGUI playerTurn;
-        [SerializeField] private Sprite[] _perPlayerSprite; //translates GameLoop's internal player "values" to sprites
+        [SerializeField] private Sprite[] perPlayerSprite; //translates GameLoop's internal player "values" to sprites
 
         private GameLoop _gameLoop;
 
         private void Awake()
         {
-            if (_perPlayerSprite.Length < _gameData.NumberOfPlayers)
+            if (perPlayerSprite.Length < gameData.NumberOfPlayers)
             {
                 Debug.LogError("Player sprites do not have enough elements for every player.");
                 mainMenu.LoadScene();
@@ -27,8 +27,8 @@ namespace TicTacToe.Gameplay
             }
 
             quit.onClick.AddListener(() => mainMenu.LoadScene());
-            _gameLoop = new GameLoop(_gameData);
-            GenerateBoardGrid(_gameLoop.BoardSize, _gameData.BoardWidth, buttonPrefab, gridUi);
+            _gameLoop = new GameLoop(gameData);
+            GenerateBoardGrid(_gameLoop.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi);
             SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
         }
 
@@ -49,9 +49,9 @@ namespace TicTacToe.Gameplay
 
         private void OnButtonClick(BoardButton button, int gridIndex)
         {
-            button.SetImage(_perPlayerSprite[_gameLoop.CurrentPlayerIndex]);
+            button.SetImage(perPlayerSprite[_gameLoop.CurrentPlayerIndex]);
             button.Toggle(false);
-            _gameLoop.BoardUpdate(gridIndex);
+            _gameLoop.PropagateInput(gridIndex);
             SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
         }
     }

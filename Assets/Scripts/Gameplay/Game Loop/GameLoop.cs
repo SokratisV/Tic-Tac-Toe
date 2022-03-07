@@ -1,69 +1,48 @@
 ﻿using System;
-using UnityEngine;
 
 namespace TicTacToe.Gameplay
 {
     public class GameLoop
     {
-        public event Action<int[,]> OnBoardUpdated;
         public event Action<int> OnGameEnd;
 
-        private event Action<int, int[,], (int x, int y)> OnBoardUpdatedInternal;
-        private readonly int[,] _board;
-        private readonly int _boardWidth;
-        private readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of having X,O
-        private readonly WinConditionCheck[] _winConditions;
-        private int _currentPlayerIndex;
+        private int _amountOfPlayers;
         private bool _hasGameEnded;
+        private readonly WinConditionCheck[] _winConditions;
+        private readonly Board _board;
 
-        public int BoardSize => _board.Length;
-        public int CurrentPlayerIndex => _currentPlayerIndex;
+        public int CurrentPlayerIndex { get; private set; }
+
+        public int BoardSize => _board.BoardSize;
 
         public GameLoop(GameData data)
         {
-            _boardWidth = data.BoardWidth;
             _winConditions = data.WinConditions;
-            _board = new int[data.BoardWidth, data.BoardHeight];
-            _perPlayerValue = new int[data.NumberOfPlayers];
-            for (var i = 0; i < data.NumberOfPlayers; i++)
-            {
-                _perPlayerValue[i] = i + 1;
-            }
-
-            OnBoardUpdatedInternal += CheckForWinner;
+            _board = new Board(data);
+            _board.OnBoardUpdated += CheckForWinner;
         }
 
-        public void BoardUpdate(int index)
+        public void PropagateInput(int gridIndex)
         {
-            if (_hasGameEnded) return;
-            var x = index % _boardWidth;
-            var y = index / _boardWidth;
-            var value = _perPlayerValue[_currentPlayerIndex];
-            _board[x, y] = value;
-            OnBoardUpdated?.Invoke(_board);
-            OnBoardUpdatedInternal?.Invoke(value, _board, (x, y));
-        }
-
-        private void CheckForWinner(int value, int[,] board, (int x, int y) coords)
-        {
-            foreach (var condition in _winConditions)
-            {
-                if (condition.Check(value, board, coords))
-                {
-                    OnGameEnd?.Invoke(_currentPlayerIndex);
-                    _hasGameEnded = true;
-                    Debug.Log($"Player {_currentPlayerIndex} won!");
-                    return;
-                }
-            }
-
-            NextPlayer();
+            _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
         }
 
         private void NextPlayer()
         {
-            _currentPlayerIndex++;
-            if (_currentPlayerIndex >= _perPlayerValue.Length) _currentPlayerIndex = 0;
+            CurrentPlayerIndex++;
+            if (CurrentPlayerIndex >= _amountOfPlayers) CurrentPlayerIndex = 0;
+        }
+
+        private void CheckForWinner(int[,] board, int playerRepresentingValue, (int x, int y) coords)
+        {
+            foreach (var condition in _winConditions)
+            {
+                if (condition.Check(playerRepresentingValue, board, coords))
+                {
+                    OnGameEnd?.Invoke(CurrentPlayerIndex);
+                    return;
+                }
+            }
         }
     }
 }
