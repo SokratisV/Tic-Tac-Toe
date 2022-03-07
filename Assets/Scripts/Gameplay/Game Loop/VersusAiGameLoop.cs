@@ -8,17 +8,28 @@
         public VersusAiGameLoop(GameData data, int turnIndex) : base(data)
         {
             data.NumberOfPlayers = 2;
-            _aiPlayer = new AIPlayer(data.Difficulty, PropagateInput);
+            _aiPlayer = new AIPlayer(data.Difficulty, gridIndex => PropagateInput(gridIndex, false));
             _aiPlayerTurnIndex = turnIndex;
-            OnRoundChanged += CheckForAiTurn;
             NextPlayer();
         }
 
-        public override void PropagateInput(int gridIndex)
+        public override void PropagateInput(int gridIndex, bool isPlayerInput = true)
         {
-            if (_hasGameEnded) return;
+            if (CheckInvalidConditions(isPlayerInput)) return;
             _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
-            NextPlayer();
+        }
+
+        protected sealed override void NextPlayer()
+        {
+            base.NextPlayer();
+            CheckForAiTurn(CurrentPlayerIndex);
+        }
+
+        protected override bool CheckInvalidConditions(bool isPlayerInput)
+        {
+            if (_hasGameEnded) return true;
+            var hasReceivedPlayerInputDuringAiTurn = isPlayerInput && CurrentPlayerIndex == _aiPlayerTurnIndex;
+            return hasReceivedPlayerInputDuringAiTurn;
         }
 
         private void CheckForAiTurn(int playerIndex)
@@ -28,13 +39,6 @@
                 //TODO: Disable input for local player?
                 _aiPlayer.MakeChoice(_board.BoardState);
             }
-        }
-
-        private void NextPlayer()
-        {
-            CurrentPlayerIndex++;
-            if (CurrentPlayerIndex >= _numberOfPlayers) CurrentPlayerIndex = 0;
-            ChangeRound(CurrentPlayerIndex);
         }
     }
 }

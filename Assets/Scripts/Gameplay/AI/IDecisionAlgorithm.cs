@@ -1,8 +1,9 @@
 ﻿namespace TicTacToe.Gameplay
 {
-    //TODO: Look at converting from interface-instance approach to pure functional
+    //TODO: Think about converting from interface-instance approach to pure functional
     public interface IDecisionAlgorithm
     {
-        int Decide(int[,] board);
+        //null means it cannot make a decision
+        int? Decide(int[,] board);
     }
 }

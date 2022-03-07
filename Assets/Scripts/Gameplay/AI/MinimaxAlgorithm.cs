@@ -2,9 +2,9 @@
 {
     public class MinimaxAlgorithm : IDecisionAlgorithm
     {
-        public int Decide(int[,] board)
+        public int? Decide(int[,] board)
         {
-            return -1;
+            return null;
         }
     }
 }

@@ -25,9 +25,16 @@ namespace TicTacToe.Gameplay
             _board.OnBoardUpdated += (_, value, coordsOfChange) => OnBoardUpdated?.Invoke(value, coordsOfChange);
         }
 
-        public abstract void PropagateInput(int gridIndex);
+        public abstract void PropagateInput(int gridIndex, bool isPlayerInput = true);
 
-        protected void ChangeRound(int nextPlayerIndex) => OnRoundChanged?.Invoke(nextPlayerIndex);
+        protected virtual void NextPlayer()
+        {
+            CurrentPlayerIndex++;
+            if (CurrentPlayerIndex >= _numberOfPlayers) CurrentPlayerIndex = 0;
+            OnRoundChanged?.Invoke(CurrentPlayerIndex);
+        }
+
+        protected abstract bool CheckInvalidConditions(bool isPlayerInput);
 
         protected virtual void CheckForWinner(int[,] board, int playerRepresentingValue, (int x, int y) coords)
         {
@@ -40,6 +47,8 @@ namespace TicTacToe.Gameplay
                     return;
                 }
             }
+
+            NextPlayer();
         }
     }
 }

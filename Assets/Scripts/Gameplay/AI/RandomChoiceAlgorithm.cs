@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TicTacToe.Gameplay
 {
@@ -6,16 +7,22 @@ namespace TicTacToe.Gameplay
     {
         private readonly Random _rng = new();
 
-        public int Decide(int[,] board)
+        public int? Decide(int[,] board)
         {
-            var boardWidth = board.GetLength(0);
-            (int x, int y) randomIndex = Helper.Translate1DTo2DCoords(_rng.Next(board.Length), boardWidth);
-            while (board[randomIndex.x, randomIndex.y] != 0)
+            var boardX = board.GetLength(0);
+            var boardY = board.GetLength(1);
+            var availableIndices = new List<int>();
+            for (var i = 0; i < boardX; i++)
             {
-                randomIndex = Helper.Translate1DTo2DCoords(_rng.Next(board.Length), boardWidth);
+                for (var j = 0; j < boardY; j++)
+                {
+                    if (board[i, j] == 0) availableIndices.Add(Helper.Translate2DTo1DIndex(i, j, boardX));
+                }
             }
 
-            return Helper.Translate2DTo1DIndex(randomIndex.x, randomIndex.y, boardWidth);
+            if (availableIndices.Count == 0) return null;
+            var randomValueFromAvailable = availableIndices[_rng.Next(availableIndices.Count)];
+            return randomValueFromAvailable;
         }
     }
 }

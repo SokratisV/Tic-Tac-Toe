@@ -1,25 +1,15 @@
 ﻿namespace TicTacToe.Gameplay
 {
-    public class LocalPvpGameLoop : GameLoopBase
+    public sealed class LocalPvpGameLoop : GameLoopBase
     {
-        public LocalPvpGameLoop(GameData data) : base(data)
-        {
-            _board.OnBoardUpdated += CheckForWinner;
-            NextPlayer();
-        }
+        public LocalPvpGameLoop(GameData data) : base(data) => NextPlayer();
 
-        public override void PropagateInput(int gridIndex)
+        public override void PropagateInput(int gridIndex, bool isPlayerInput = true)
         {
-            if (_hasGameEnded) return;
+            if (CheckInvalidConditions(isPlayerInput)) return;
             _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
-            NextPlayer();
         }
 
-        private void NextPlayer()
-        {
-            CurrentPlayerIndex++;
-            if (CurrentPlayerIndex >= _numberOfPlayers) CurrentPlayerIndex = 0;
-            ChangeRound(CurrentPlayerIndex);
-        }
+        protected override bool CheckInvalidConditions(bool isPlayerInput) => _hasGameEnded;
     }
 }

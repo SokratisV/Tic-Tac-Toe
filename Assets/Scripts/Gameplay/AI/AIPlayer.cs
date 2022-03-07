@@ -16,7 +16,8 @@ namespace TicTacToe.Gameplay
         public void MakeChoice(int[,] board)
         {
             var output = _algorithm.Decide(board);
-            _propagateInput?.Invoke(output);
+            if (output == null) return;
+            _propagateInput?.Invoke(output.Value);
         }
 
         private static IDecisionAlgorithm AssignAiDifficulty(AiDifficulty difficulty)
