@@ -6,14 +6,15 @@ namespace TicTacToe.Gameplay
     {
         public event Action<int[,], int, (int x, int y)> OnBoardUpdated;
 
-        private readonly int[,] _board;
-        private readonly int _boardWidth;
+        public int[,] BoardState { get; }
+        public int BoardWidth { get; }
+
         private readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of being bound to X,O, etc
 
         public Board(GameData data)
         {
-            _boardWidth = data.BoardWidth;
-            _board = new int[data.BoardWidth, data.BoardHeight];
+            BoardWidth = data.BoardWidth;
+            BoardState = new int[data.BoardWidth, data.BoardHeight];
             _perPlayerValue = new int[data.NumberOfPlayers];
             for (var i = 0; i < data.NumberOfPlayers; i++)
             {
@@ -23,17 +24,10 @@ namespace TicTacToe.Gameplay
 
         public void BoardUpdate(int indexOfBoardElement, int playerIndex)
         {
-            var (x, y) = Translate1DTo2DCoords(indexOfBoardElement, _boardWidth);
+            var (x, y) = Helper.Translate1DTo2DCoords(indexOfBoardElement, BoardWidth);
             var playerRepresentingValue = _perPlayerValue[playerIndex];
-            _board[x, y] = playerRepresentingValue;
-            OnBoardUpdated?.Invoke(_board, playerRepresentingValue, (x, y));
-        }
-
-        private static (int, int) Translate1DTo2DCoords(int indexOf1DArray, int boardWidth)
-        {
-            var x = indexOf1DArray % boardWidth;
-            var y = indexOf1DArray / boardWidth;
-            return (x, y);
+            BoardState[x, y] = playerRepresentingValue;
+            OnBoardUpdated?.Invoke(BoardState, playerRepresentingValue, (x, y));
         }
     }
 }

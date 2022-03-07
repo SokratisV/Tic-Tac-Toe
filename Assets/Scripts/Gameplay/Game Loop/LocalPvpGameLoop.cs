@@ -2,7 +2,11 @@
 {
     public class LocalPvpGameLoop : GameLoopBase
     {
-        public LocalPvpGameLoop(GameData data) : base(data) => _board.OnBoardUpdated += CheckForWinner;
+        public LocalPvpGameLoop(GameData data) : base(data)
+        {
+            _board.OnBoardUpdated += CheckForWinner;
+            NextPlayer();
+        }
 
         public override void PropagateInput(int gridIndex)
         {

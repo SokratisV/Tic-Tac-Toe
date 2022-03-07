@@ -4,6 +4,7 @@ namespace TicTacToe.Gameplay
 {
     public abstract class GameLoopBase
     {
+        public event Action<int, (int x, int y)> OnBoardUpdated;
         public event Action<int> OnRoundChanged;
         public event Action<int> OnGameEnded;
 
@@ -12,13 +13,16 @@ namespace TicTacToe.Gameplay
         protected readonly WinConditionCheck[] _winConditions;
         protected readonly Board _board;
 
-        public int CurrentPlayerIndex { get; protected set; }
+        public int CurrentPlayerIndex { get; protected set; } = -1;
+        public int BoardWidth => _board.BoardWidth;
 
         protected GameLoopBase(GameData data)
         {
             _numberOfPlayers = data.NumberOfPlayers;
             _winConditions = data.WinConditions;
             _board = new Board(data);
+            _board.OnBoardUpdated += CheckForWinner;
+            _board.OnBoardUpdated += (_, value, coordsOfChange) => OnBoardUpdated?.Invoke(value, coordsOfChange);
         }
 
         public abstract void PropagateInput(int gridIndex);

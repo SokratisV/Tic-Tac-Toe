@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Game Data
   m_EditorClassIdentifier: 
   NumberOfPlayers: 2
-  BoardWidth: 6
-  BoardHeight: 4
+  BoardWidth: 3
+  BoardHeight: 3
   WinConditions:
   - {fileID: 11400000, guid: 91034b559c875ea45b73e482484ff52a, type: 2}
   - {fileID: 11400000, guid: 4ff116fbdcb860a4c97c4adf56f23e5e, type: 2}

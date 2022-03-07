@@ -13,19 +13,12 @@ namespace TicTacToe.Gameplay
         [SerializeField] private Button quit;
         [SerializeField] private BoardButton buttonPrefab;
         [SerializeField] private TextMeshProUGUI playerTurn;
-        [SerializeField] private Sprite[] perPlayerSprite; //translates GameLoop's internal player "values" to sprites
+        [SerializeField] private Sprite[] perBoardValueSprite; //translates GameLoop's internal player "values" to sprites
 
         private GameLoopBase _gameLoop;
 
         private void Awake()
         {
-            if (perPlayerSprite.Length < gameData.NumberOfPlayers)
-            {
-                Debug.LogError("Player sprites are not enough for every player.");
-                mainMenu.LoadScene();
-                return;
-            }
-
             quit.onClick.AddListener(() => mainMenu.LoadScene());
             //TODO: Possibly delegate instantiation responsibility to different class
             switch (gameData.GameMode)
@@ -34,17 +27,25 @@ namespace TicTacToe.Gameplay
                     _gameLoop = new LocalPvpGameLoop(gameData);
                     break;
                 case GameMode.VsAi:
-                    _gameLoop = new VersusAiGameLoop(gameData, gameData.Difficulty);
+                    _gameLoop = new VersusAiGameLoop(gameData, 1);
                     break;
             }
 
             GenerateBoardGrid(gameData.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi, _gameLoop);
             SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
+            _gameLoop.OnBoardUpdated += UpdateGridUi;
+            _gameLoop.OnRoundChanged += SetCurrentPlayerText;
         }
 
-        private void SetCurrentPlayerText(int playerIndex) => playerTurn.SetText($"Player {playerIndex}");
+        private void UpdateGridUi(int value, (int x, int y) gridIndex)
+        {
+            var child = gridUi.transform.GetChild(Helper.Translate2DTo1DIndex(gridIndex.x, gridIndex.y, _gameLoop.BoardWidth));
+            var button = child.GetComponentInChildren<BoardButton>();
+            button.SetImage(perBoardValueSprite[value]);
+            button.Toggle(false);
+        }
 
-        private void GenerateBoardGrid(int boardSize, int gridWidth, BoardButton prefab, GridLayoutGroup grid, GameLoopBase gameLoop)
+        private static void GenerateBoardGrid(int boardSize, int gridWidth, BoardButton prefab, GridLayoutGroup grid, GameLoopBase gameLoop)
         {
             grid.constraintCount = gridWidth;
             var gridParent = grid.transform;
@@ -52,17 +53,12 @@ namespace TicTacToe.Gameplay
             {
                 var button = Instantiate(prefab, gridParent);
                 var gridIndex = i;
-                button.AddListener(() => OnButtonClick(button, gridIndex, gameLoop));
+                button.AddListener(() => OnButtonClick(gridIndex, gameLoop));
                 gameLoop.OnGameEnded += _ => button.Toggle(false);
             }
         }
 
-        private void OnButtonClick(BoardButton button, int gridIndex, GameLoopBase gameLoop)
-        {
-            button.SetImage(perPlayerSprite[_gameLoop.CurrentPlayerIndex]);
-            button.Toggle(false);
-            gameLoop.PropagateInput(gridIndex);
-            SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
-        }
+        private void SetCurrentPlayerText(int playerIndex) => playerTurn.SetText($"Player {playerIndex}");
+        private static void OnButtonClick(int gridIndex, GameLoopBase gameLoop) => gameLoop.PropagateInput(gridIndex);
     }
 }
