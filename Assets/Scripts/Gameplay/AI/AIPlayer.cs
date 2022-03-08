@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TicTacToe.Gameplay
 {
@@ -6,6 +7,8 @@ namespace TicTacToe.Gameplay
     {
         private IDecisionAlgorithm _algorithm;
         private Action<int> _propagateInput;
+        private Action<Action, float> _delayedInvocation;
+        private readonly Action<bool> _toggleUserInput;
 
         public AIPlayer(AiDifficulty difficulty, Action<int> propagateInput)
         {
@@ -13,9 +16,10 @@ namespace TicTacToe.Gameplay
             _propagateInput = propagateInput;
         }
 
-        public void MakeChoice(int[,] board)
+        public async void MakeChoice(int[,] board)
         {
-            var output = _algorithm.Decide(board);
+            _toggleUserInput?.Invoke(false);
+            var output = await Task.Run(() => _algorithm.Decide(board));
             if (output == null) return;
             _propagateInput?.Invoke(output.Value);
         }

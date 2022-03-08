@@ -9,11 +9,10 @@ namespace TicTacToe.Gameplay
         public event Action<int> OnGameEnded;
 
         protected readonly int _numberOfPlayers;
-        protected bool _hasGameEnded;
         protected readonly WinConditionCheck[] _winConditions;
         protected readonly Board _board;
 
-        public int CurrentPlayerIndex { get; protected set; } = -1;
+        public int CurrentPlayerIndex { get; private set; } = -1;
         public int BoardWidth => _board.BoardWidth;
 
         protected GameLoopBase(GameData data)
@@ -34,8 +33,6 @@ namespace TicTacToe.Gameplay
             OnRoundChanged?.Invoke(CurrentPlayerIndex);
         }
 
-        protected abstract bool CheckInvalidConditions(bool isPlayerInput);
-
         protected virtual void CheckForWinner(int[,] board, int playerRepresentingValue, (int x, int y) coords)
         {
             foreach (var condition in _winConditions)
@@ -43,7 +40,9 @@ namespace TicTacToe.Gameplay
                 if (condition.Check(playerRepresentingValue, board, coords))
                 {
                     OnGameEnded?.Invoke(CurrentPlayerIndex);
-                    _hasGameEnded = true;
+                    _board.BoardReset();
+                    CurrentPlayerIndex = -1;
+                    NextPlayer();
                     return;
                 }
             }

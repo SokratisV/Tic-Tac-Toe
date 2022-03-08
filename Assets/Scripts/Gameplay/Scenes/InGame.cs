@@ -1,4 +1,6 @@
-﻿using RoboRyanTron.SceneReference;
+﻿using System;
+using System.Collections;
+using RoboRyanTron.SceneReference;
 using TicTacToe.Audio;
 using TMPro;
 using UnityEngine;
@@ -21,26 +23,33 @@ namespace TicTacToe.Gameplay
 
         private void Awake()
         {
+            _gameLoop = SetupGameLoop(gameData);
+            GenerateBoardGrid(gameData.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi, _gameLoop, _audioEngine);
+            SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
+            SetupListeners();
+        }
+
+        private void SetupListeners()
+        {
+            _gameLoop.OnBoardUpdated += UpdateGridUi;
+            _gameLoop.OnRoundChanged += SetCurrentPlayerText;
+            _gameLoop.OnGameEnded += _ => _audioEngine.Play(_audioEngine.Library.RoundEnd);
             quit.onClick.AddListener(() =>
             {
                 _audioEngine.Play(_audioEngine.Library.ButtonClick);
                 mainMenu.LoadScene();
             });
+        }
+        
+        private GameLoopBase SetupGameLoop(GameData data)
+        {
             //TODO: Possibly delegate instantiation responsibility to different class
-            switch (gameData.GameMode)
+            return data.GameMode switch
             {
-                case GameMode.Local:
-                    _gameLoop = new LocalPvpGameLoop(gameData);
-                    break;
-                case GameMode.VsAi:
-                    _gameLoop = new VersusAiGameLoop(gameData, 1);
-                    break;
-            }
-
-            GenerateBoardGrid(gameData.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi, _gameLoop, _audioEngine);
-            SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
-            _gameLoop.OnBoardUpdated += UpdateGridUi;
-            _gameLoop.OnRoundChanged += SetCurrentPlayerText;
+                GameMode.Local => new LocalPvpGameLoop(data),
+                GameMode.VsAi => new VersusAiGameLoop(data, InvokeMethodWithDelay),
+                _ => new LocalPvpGameLoop(data)
+            };
         }
 
         private void UpdateGridUi(int value, (int x, int y) gridIndex)
@@ -51,16 +60,16 @@ namespace TicTacToe.Gameplay
             button.Toggle(false);
         }
 
-        private static void GenerateBoardGrid(int boardSize, int gridWidth, BoardButton prefab, GridLayoutGroup grid, GameLoopBase gameLoop, AudioEngine engine)
+        private void GenerateBoardGrid(int size, int width, BoardButton prefab, GridLayoutGroup grid, GameLoopBase loop, AudioEngine engine)
         {
-            grid.constraintCount = gridWidth;
+            grid.constraintCount = width;
             var gridParent = grid.transform;
-            for (var i = 0; i < boardSize; i++)
+            for (var i = 0; i < size; i++)
             {
                 var button = Instantiate(prefab, gridParent);
                 var gridIndex = i;
-                button.AddListener(() => OnButtonClick(gridIndex, gameLoop, engine));
-                gameLoop.OnGameEnded += _ => button.Toggle(false);
+                button.AddListener(() => OnButtonClick(gridIndex, loop, engine));
+                loop.OnGameEnded += _ => InvokeMethodWithDelay(button.Reset, 2f);
             }
         }
 
@@ -70,6 +79,14 @@ namespace TicTacToe.Gameplay
         {
             audioEngine.Play(audioEngine.Library.TileClick);
             gameLoop.PropagateInput(gridIndex);
+        }
+
+        private void InvokeMethodWithDelay(Action action, float delay) => StartCoroutine(DelayAction(action, delay));
+
+        private static IEnumerator DelayAction(Action action, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            action?.Invoke();
         }
     }
 }

@@ -4,12 +4,6 @@
     {
         public LocalPvpGameLoop(GameData data) : base(data) => NextPlayer();
 
-        public override void PropagateInput(int gridIndex, bool isPlayerInput = true)
-        {
-            if (CheckInvalidConditions(isPlayerInput)) return;
-            _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
-        }
-
-        protected override bool CheckInvalidConditions(bool isPlayerInput) => _hasGameEnded;
+        public override void PropagateInput(int gridIndex, bool isPlayerInput = true) => _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
     }
 }
