@@ -1,4 +1,5 @@
 ﻿using RoboRyanTron.SceneReference;
+using TicTacToe.Audio;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,7 @@ namespace TicTacToe.Gameplay
     {
         [SerializeField] private SceneReference mainMenu;
         [SerializeField] private GameData gameData;
+        [SerializeField] private AudioEngine _audioEngine;
         [SerializeField] private GridLayoutGroup gridUi;
         [SerializeField] private Button quit;
         [SerializeField] private BoardButton buttonPrefab;
@@ -19,7 +21,11 @@ namespace TicTacToe.Gameplay
 
         private void Awake()
         {
-            quit.onClick.AddListener(() => mainMenu.LoadScene());
+            quit.onClick.AddListener(() =>
+            {
+                _audioEngine.Play(_audioEngine.Library.ButtonClick);
+                mainMenu.LoadScene();
+            });
             //TODO: Possibly delegate instantiation responsibility to different class
             switch (gameData.GameMode)
             {
@@ -31,7 +37,7 @@ namespace TicTacToe.Gameplay
                     break;
             }
 
-            GenerateBoardGrid(gameData.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi, _gameLoop);
+            GenerateBoardGrid(gameData.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi, _gameLoop, _audioEngine);
             SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
             _gameLoop.OnBoardUpdated += UpdateGridUi;
             _gameLoop.OnRoundChanged += SetCurrentPlayerText;
@@ -45,7 +51,7 @@ namespace TicTacToe.Gameplay
             button.Toggle(false);
         }
 
-        private static void GenerateBoardGrid(int boardSize, int gridWidth, BoardButton prefab, GridLayoutGroup grid, GameLoopBase gameLoop)
+        private static void GenerateBoardGrid(int boardSize, int gridWidth, BoardButton prefab, GridLayoutGroup grid, GameLoopBase gameLoop, AudioEngine engine)
         {
             grid.constraintCount = gridWidth;
             var gridParent = grid.transform;
@@ -53,12 +59,17 @@ namespace TicTacToe.Gameplay
             {
                 var button = Instantiate(prefab, gridParent);
                 var gridIndex = i;
-                button.AddListener(() => OnButtonClick(gridIndex, gameLoop));
+                button.AddListener(() => OnButtonClick(gridIndex, gameLoop, engine));
                 gameLoop.OnGameEnded += _ => button.Toggle(false);
             }
         }
 
         private void SetCurrentPlayerText(int playerIndex) => playerTurn.SetText($"Player {playerIndex}");
-        private static void OnButtonClick(int gridIndex, GameLoopBase gameLoop) => gameLoop.PropagateInput(gridIndex);
+
+        private static void OnButtonClick(int gridIndex, GameLoopBase gameLoop, AudioEngine audioEngine)
+        {
+            audioEngine.Play(audioEngine.Library.TileClick);
+            gameLoop.PropagateInput(gridIndex);
+        }
     }
 }

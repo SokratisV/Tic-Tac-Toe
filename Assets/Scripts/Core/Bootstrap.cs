@@ -7,6 +7,7 @@ namespace TicTacToe
     {
         [SerializeField] private SceneReference menuScene;
         [SerializeField] private Camera cameraPrefab;
+        [SerializeField] private AudioSource globalAudioSource;
 
         private void Start()
         {
@@ -17,6 +18,8 @@ namespace TicTacToe
         private void GenerateInitialData(AsyncOperation _)
         {
             DontDestroyOnLoad(Instantiate(cameraPrefab));
+            var musicObject = Instantiate(globalAudioSource);
+            DontDestroyOnLoad(musicObject.gameObject);
         }
     }
 }
