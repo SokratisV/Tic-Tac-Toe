@@ -15,8 +15,7 @@ namespace TicTacToe.Gameplay
             data.NumberOfPlayers = 2;
             _delayedInvocation = invokeMethodWithDelay;
             _aiPlayer = new AIPlayer(data.Difficulty, gridIndex => PropagateInput(gridIndex, false));
-            _aiPlayerTurnIndex = DecideWhoPlaysFirst();
-            _isPlayerInputEnabled = _aiPlayerTurnIndex == 1;
+            _aiPlayerTurnIndex = 1;
             NextPlayer();
         }
 
@@ -35,7 +34,7 @@ namespace TicTacToe.Gameplay
         private bool CheckInvalidConditions(bool isPlayerInput)
         {
             var hasReceivedPlayerInputDuringAiTurn = isPlayerInput && CurrentPlayerIndex == _aiPlayerTurnIndex;
-            return hasReceivedPlayerInputDuringAiTurn || _isPlayerInputEnabled == false;
+            return hasReceivedPlayerInputDuringAiTurn || _isPlayerInputEnabled == false || _hasGameEnded;
         }
 
         private void CheckForAiTurn(int currentPlayerIndex)
@@ -47,13 +46,6 @@ namespace TicTacToe.Gameplay
                 _aiPlayer.MakeChoice(_board.BoardState);
                 ToggleUserInput(true);
             }, AIThinkDelay);
-        }
-
-        private static int DecideWhoPlaysFirst()
-        {
-            var random = UnityEngine.Random.Range(0, 1);
-            var aiIndex = random == 0 ? 1 : 0;
-            return aiIndex;
         }
 
         private void ToggleUserInput(bool toggle) => _isPlayerInputEnabled = toggle;

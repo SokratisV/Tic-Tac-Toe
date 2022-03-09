@@ -6,11 +6,13 @@ namespace TicTacToe.Gameplay
     {
         public event Action<int, (int x, int y)> OnBoardUpdated;
         public event Action<int> OnRoundChanged;
-        public event Action<int> OnGameEnded;
+        public event Action OnBoardReset;
+        public event Action<int> OnGameEnded; //-1 means nobody won (draw)
 
         protected readonly int _numberOfPlayers;
         protected readonly WinConditionCheck[] _winConditions;
         protected readonly Board _board;
+        protected bool _hasGameEnded;
 
         public int CurrentPlayerIndex { get; private set; } = -1;
         public int BoardWidth => _board.BoardWidth;
@@ -22,6 +24,15 @@ namespace TicTacToe.Gameplay
             _board = new Board(data);
             _board.OnBoardUpdated += CheckForWinner;
             _board.OnBoardUpdated += (_, value, coordsOfChange) => OnBoardUpdated?.Invoke(value, coordsOfChange);
+        }
+
+        public void ResetBoard()
+        {
+            _hasGameEnded = false;
+            _board.BoardReset();
+            CurrentPlayerIndex = -1;
+            NextPlayer();
+            OnBoardReset?.Invoke();
         }
 
         public abstract void PropagateInput(int gridIndex, bool isPlayerInput = true);
@@ -40,14 +51,28 @@ namespace TicTacToe.Gameplay
                 if (condition.Check(playerRepresentingValue, board, coords))
                 {
                     OnGameEnded?.Invoke(CurrentPlayerIndex);
-                    _board.BoardReset();
-                    CurrentPlayerIndex = -1;
-                    NextPlayer();
+                    _hasGameEnded = true;
                     return;
                 }
             }
 
+            if (CheckForDraw(board))
+            {
+                OnGameEnded?.Invoke(-1);
+            }
+
             NextPlayer();
+        }
+
+        //Note: could be done same way as WinConditions, but that'd be an overkill
+        private static bool CheckForDraw(int[,] board)
+        {
+            foreach (var element in board)
+            {
+                if (element == 0) return false;
+            }
+
+            return true;
         }
     }
 }

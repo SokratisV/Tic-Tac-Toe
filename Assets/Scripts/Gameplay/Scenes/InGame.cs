@@ -16,31 +16,50 @@ namespace TicTacToe.Gameplay
         [SerializeField] private GridLayoutGroup gridUi;
         [SerializeField] private Button quit;
         [SerializeField] private BoardButton buttonPrefab;
-        [SerializeField] private TextMeshProUGUI playerTurn;
+        [SerializeField] private TextMeshProUGUI player1Score, player2Score;
         [SerializeField] private Sprite[] perBoardValueSprite; //translates GameLoop's internal player "values" to sprites
 
         private GameLoopBase _gameLoop;
+        private const float BoardResetTime = 1f;
+        private int _player1Score, _player2Score;
 
         private void Awake()
         {
             _gameLoop = SetupGameLoop(gameData);
             GenerateBoardGrid(gameData.BoardSize, gameData.BoardWidth, buttonPrefab, gridUi, _gameLoop, _audioEngine);
-            SetCurrentPlayerText(_gameLoop.CurrentPlayerIndex);
             SetupListeners();
         }
 
         private void SetupListeners()
         {
             _gameLoop.OnBoardUpdated += UpdateGridUi;
-            _gameLoop.OnRoundChanged += SetCurrentPlayerText;
-            _gameLoop.OnGameEnded += _ => _audioEngine.Play(_audioEngine.Library.RoundEnd);
+            _gameLoop.OnGameEnded += winner =>
+            {
+                _audioEngine.Play(_audioEngine.Library.RoundEnd);
+                UpdateScore(winner, player1Score, player2Score);
+                InvokeMethodWithDelay(() => _gameLoop.ResetBoard(), BoardResetTime);
+            };
             quit.onClick.AddListener(() =>
             {
                 _audioEngine.Play(_audioEngine.Library.ButtonClick);
                 mainMenu.LoadScene();
             });
         }
-        
+
+        private void UpdateScore(int winner, TMP_Text player1, TMP_Text player2)
+        {
+            if (winner == 0)
+            {
+                _player1Score++;
+                player1.SetText(_player1Score.ToString());
+            }
+            else if (winner == 1)
+            {
+                _player2Score++;
+                player2.SetText(_player2Score.ToString());
+            }
+        }
+
         private GameLoopBase SetupGameLoop(GameData data)
         {
             //TODO: Possibly delegate instantiation responsibility to different class
@@ -69,11 +88,9 @@ namespace TicTacToe.Gameplay
                 var button = Instantiate(prefab, gridParent);
                 var gridIndex = i;
                 button.AddListener(() => OnButtonClick(gridIndex, loop, engine));
-                loop.OnGameEnded += _ => InvokeMethodWithDelay(button.Reset, 2f);
+                _gameLoop.OnBoardReset += button.Reset;
             }
         }
-
-        private void SetCurrentPlayerText(int playerIndex) => playerTurn.SetText($"Player {playerIndex}");
 
         private static void OnButtonClick(int gridIndex, GameLoopBase gameLoop, AudioEngine audioEngine)
         {

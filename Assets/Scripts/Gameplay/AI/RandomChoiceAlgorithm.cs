@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Random = System.Random;
 
 namespace TicTacToe.Gameplay
 {
@@ -9,6 +10,7 @@ namespace TicTacToe.Gameplay
 
         public int? Decide(int[,] board)
         {
+            Debug.Log("Called");
             var boardX = board.GetLength(0);
             var boardY = board.GetLength(1);
             var availableIndices = new List<int>();
@@ -20,8 +22,10 @@ namespace TicTacToe.Gameplay
                 }
             }
 
+            Debug.Log(availableIndices.Count);
             if (availableIndices.Count == 0) return null;
             var randomValueFromAvailable = availableIndices[_rng.Next(availableIndices.Count)];
+            Debug.Log(randomValueFromAvailable);
             return randomValueFromAvailable;
         }
     }
