@@ -8,7 +8,7 @@ namespace TicTacToe.Gameplay
     {
         private readonly Random _rng = new();
 
-        public int? Decide(int[,] board)
+        public int? Decide(int[,] board, int valueToCheck)
         {
             Debug.Log("Called");
             var boardX = board.GetLength(0);

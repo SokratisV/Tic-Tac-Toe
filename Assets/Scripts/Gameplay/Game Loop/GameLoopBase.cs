@@ -13,6 +13,7 @@ namespace TicTacToe.Gameplay
         protected readonly WinConditionCheck[] _winConditions;
         protected readonly Board _board;
         protected bool _hasGameEnded;
+        protected readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of being bound to X,O, etc
 
         public int CurrentPlayerIndex { get; private set; } = -1;
         public int BoardWidth => _board.BoardWidth;
@@ -22,6 +23,12 @@ namespace TicTacToe.Gameplay
             _numberOfPlayers = data.NumberOfPlayers;
             _winConditions = data.WinConditions;
             _board = new Board(data);
+            _perPlayerValue = new int[data.NumberOfPlayers];
+            for (var i = 0; i < data.NumberOfPlayers; i++)
+            {
+                _perPlayerValue[i] = i + 1;
+            }
+
             _board.OnBoardUpdated += CheckForWinner;
             _board.OnBoardUpdated += (_, value, coordsOfChange) => OnBoardUpdated?.Invoke(value, coordsOfChange);
         }

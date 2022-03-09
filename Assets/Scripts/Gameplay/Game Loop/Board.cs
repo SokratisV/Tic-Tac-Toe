@@ -9,25 +9,18 @@ namespace TicTacToe.Gameplay
         public int[,] BoardState { get; private set; }
         public int BoardWidth { get; }
         public int BoardHeight { get; }
-
-        private readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of being bound to X,O, etc
-
+        
         public Board(GameData data)
         {
             BoardWidth = data.BoardWidth;
             BoardHeight = data.BoardHeight;
             BoardState = new int[data.BoardWidth, data.BoardHeight];
-            _perPlayerValue = new int[data.NumberOfPlayers];
-            for (var i = 0; i < data.NumberOfPlayers; i++)
-            {
-                _perPlayerValue[i] = i + 1;
-            }
         }
 
-        public void BoardUpdate(int indexOfBoardElement, int playerIndex)
+        public void BoardUpdate(int indexOfBoardElement, int playerIndex, int value)
         {
             var (x, y) = Helper.Translate1DTo2DCoords(indexOfBoardElement, BoardWidth);
-            var playerRepresentingValue = _perPlayerValue[playerIndex];
+            var playerRepresentingValue = value;
             BoardState[x, y] = playerRepresentingValue;
             OnBoardUpdated?.Invoke(BoardState, playerRepresentingValue, (x, y));
         }

@@ -7,7 +7,7 @@
         public override void PropagateInput(int gridIndex, bool isPlayerInput = true)
         {
             if (CheckInvalidConditions()) return;
-            _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
+            _board.BoardUpdate(gridIndex, CurrentPlayerIndex, _perPlayerValue[CurrentPlayerIndex]);
         }
 
         private bool CheckInvalidConditions() => _hasGameEnded;

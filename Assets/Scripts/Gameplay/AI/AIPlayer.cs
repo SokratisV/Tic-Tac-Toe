@@ -16,10 +16,10 @@ namespace TicTacToe.Gameplay
             _propagateInput = propagateInput;
         }
 
-        public async void MakeChoice(int[,] board)
+        public async void MakeChoice(int[,] board, int valueToCheck)
         {
             _toggleUserInput?.Invoke(false);
-            var output = await Task.Run(() => _algorithm.Decide(board));
+            var output = await Task.Run(() => _algorithm.Decide(board, valueToCheck));
             if (output == null) return;
             _propagateInput?.Invoke(output.Value);
         }
@@ -29,8 +29,8 @@ namespace TicTacToe.Gameplay
             return difficulty switch
             {
                 AiDifficulty.Easy => new RandomChoiceAlgorithm(),
-                AiDifficulty.Medium => new RandomChoiceAlgorithm(),
-                AiDifficulty.Hard => new MinimaxAlgorithm(),
+                AiDifficulty.Medium => new MinimaxAlgorithm(2),
+                AiDifficulty.Hard => new MinimaxAlgorithm(5),
                 _ => new RandomChoiceAlgorithm()
             };
         }

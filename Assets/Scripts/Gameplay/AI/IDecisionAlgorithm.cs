@@ -4,6 +4,6 @@
     public interface IDecisionAlgorithm
     {
         //null means it cannot make a decision
-        int? Decide(int[,] board);
+        int? Decide(int[,] board, int valueToCheck);
     }
 }
