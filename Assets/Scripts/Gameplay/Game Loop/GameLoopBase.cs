@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TicTacToe.Gameplay
 {
@@ -10,7 +11,7 @@ namespace TicTacToe.Gameplay
         public event Action<int> OnGameEnded; //-1 means nobody won (draw)
 
         protected readonly int _numberOfPlayers;
-        protected readonly WinConditionCheck[] _winConditions;
+        protected readonly List<Func<int, int[,], (int, int), bool>> _winConditions;
         protected readonly Board _board;
         protected bool _hasGameEnded;
         protected readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of being bound to X,O, etc
@@ -21,7 +22,8 @@ namespace TicTacToe.Gameplay
         protected GameLoopBase(GameData data)
         {
             _numberOfPlayers = data.NumberOfPlayers;
-            _winConditions = data.WinConditions;
+            _winConditions = data.GetWinConditions();
+
             _board = new Board(data);
             _perPlayerValue = new int[data.NumberOfPlayers];
             for (var i = 0; i < data.NumberOfPlayers; i++)
@@ -51,11 +53,11 @@ namespace TicTacToe.Gameplay
             OnRoundChanged?.Invoke(CurrentPlayerIndex);
         }
 
-        protected virtual void CheckForWinner(int[,] board, int playerRepresentingValue, (int x, int y) coords)
+        private void CheckForWinner(int[,] board, int playerRepresentingValue, (int x, int y) coords)
         {
             foreach (var condition in _winConditions)
             {
-                if (condition.Check(playerRepresentingValue, board, coords))
+                if (condition.Invoke(playerRepresentingValue, board, coords))
                 {
                     OnGameEnded?.Invoke(CurrentPlayerIndex);
                     _hasGameEnded = true;
