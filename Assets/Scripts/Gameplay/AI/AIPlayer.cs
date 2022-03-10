@@ -29,7 +29,7 @@ namespace TicTacToe.Gameplay
             return difficulty switch
             {
                 AiDifficulty.Easy => new RandomChoiceAlgorithm(),
-                AiDifficulty.Medium => new MinimaxAlgorithm(numberOfPlayers),
+                AiDifficulty.Medium => new MinimaxAlgorithm(numberOfPlayers, true),
                 AiDifficulty.Hard => new MinimaxAlgorithm(numberOfPlayers),
                 _ => new RandomChoiceAlgorithm()
             };

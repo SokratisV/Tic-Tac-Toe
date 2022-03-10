@@ -6,9 +6,10 @@ namespace TicTacToe.Gameplay
     public class MinimaxAlgorithm : IDecisionAlgorithm
     {
         private readonly int[] _availableValues;
-        private Random _rng = new();
+        private readonly Random _rng = new();
+        private bool _isMediumDifficulty;
 
-        public MinimaxAlgorithm(int numberOfPlayers)
+        public MinimaxAlgorithm(int numberOfPlayers, bool isMediumDifficulty = false)
         {
             _availableValues = new int[numberOfPlayers];
             for (var i = 0; i < numberOfPlayers; i++)
@@ -20,9 +21,7 @@ namespace TicTacToe.Gameplay
         public int? Decide(int[,] board, int startValue, Func<int[,], int, (int, int), int> winConditions)
         {
             var availableMoves = board.GetAvailableMoves();
-            //Optimisation: Basically if it's the 2nd move on the board there's no reason to check all permutations
-            //so simply return a random move.
-            if (IsPerformingSecondMoveOnBoard(availableMoves.Count, board))
+            if (_isMediumDifficulty && IsPerformingSecondMoveOnBoard(availableMoves.Count, board))
                 return availableMoves[_rng.Next(availableMoves.Count)];
 
             var topMove = availableMoves.First();
@@ -73,7 +72,7 @@ namespace TicTacToe.Gameplay
             }
 
             var myTurn = isMyTurn.Invoke(value);
-            return myTurn ? scores.Max() : scores.Min();
+            return myTurn ? scores.Min() : scores.Max();
         }
 
         private static int DrawScore() => 0;
