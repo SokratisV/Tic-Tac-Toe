@@ -6,6 +6,6 @@ namespace TicTacToe.Gameplay
     public interface IDecisionAlgorithm
     {
         //null means it cannot make a decision
-        int? Decide(int[,] board, int value, Func<int[,], int, (int, int), int> winConditions);
+        int? Decide(int[,] board, int startValue, Func<int[,], int, (int, int), int> winConditions);
     }
 }

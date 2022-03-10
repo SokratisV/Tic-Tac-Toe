@@ -20,6 +20,17 @@ namespace TicTacToe
 
             return availableIndices;
         }
+        
+        //Note: could be done same way as WinConditions, but that'd be an overkill
+        public static bool CheckForDraw(this int[,] board)
+        {
+            foreach (var element in board)
+            {
+                if (element == -1) return false;
+            }
+
+            return true;
+        }
 
         public static int[,] FillArrayWithValue(this int[,] array, int value)
         {
@@ -34,6 +45,13 @@ namespace TicTacToe
             }
 
             return array;
+        }
+
+        public static T GetNextElementWithLoop<T>(this T[] array, int currentIndex)
+        {
+            if (currentIndex >= array.Length - 1) currentIndex = 0;
+            else currentIndex++;
+            return array[currentIndex];
         }
     }
 }

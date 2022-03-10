@@ -57,7 +57,7 @@ namespace TicTacToe.Gameplay
                 }
             }
 
-            if (Helper.CheckForDraw(board))
+            if (board.CheckForDraw())
             {
                 OnGameEnded?.Invoke(-1);
                 return;
@@ -77,11 +77,7 @@ namespace TicTacToe.Gameplay
                 }
             }
 
-            if (Helper.CheckForDraw(board))
-            {
-                return -1;
-            }
-
+            if (board.CheckForDraw()) return -1;
             return -2;
         }
     }

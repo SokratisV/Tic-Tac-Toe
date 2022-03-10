@@ -1,23 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace TicTacToe.Gameplay
 {
     public class MinimaxAlgorithm : IDecisionAlgorithm
     {
-        private int _depth;
+        private readonly int _depth;
+        private readonly int[] _availableValues;
 
-        public MinimaxAlgorithm(int depth) => _depth = depth;
-
-        public int? Decide(int[,] board, int value, Func<int[,], int, (int, int), int> winConditions)
+        public MinimaxAlgorithm(int numberOfPlayers, int depth)
         {
+            _depth = depth;
+            _availableValues = new int[numberOfPlayers];
+            for (var i = 0; i < numberOfPlayers; i++)
+            {
+                _availableValues[i] = i;
+            }
+        }
+
+        public int? Decide(int[,] board, int startValue, Func<int[,], int, (int, int), int> winConditions)
+        {
+            var clone = board.Clone() as int[,];
             var availableMoves = board.GetAvailableMoves();
             var topMove = availableMoves.First();
             var bestMove = 0;
+            bool IsMyTurn(int currentPlayerIndex) => currentPlayerIndex == startValue;
             foreach (var move in availableMoves)
             {
-                var score = GetMinimaxScore(value, move, board, _depth, winConditions);
+                var score = GetMinimaxScore(startValue, _availableValues, move, clone, _depth, IsMyTurn, winConditions);
                 if (score <= bestMove) continue;
 
                 bestMove = score;
@@ -27,37 +37,35 @@ namespace TicTacToe.Gameplay
             return topMove;
         }
 
-        //Value - the value that represents the player making the choice on the board
-        //Move - 1D index in the board
-        private static int GetMinimaxScore(int value, int move, int[,] board, int depth, Func<int[,], int, (int, int), int> winConditions)
+        //Value - the value that represents the player making the choice on the board, (both their turn index and their board value)
+        //Move - 1D index on the board
+        private static int GetMinimaxScore(int value, int[] availableValues, int move, int[,] board, int depth, Func<int, bool> isMyTurn,
+            Func<int[,], int, (int, int), int> winConditions)
         {
             (int x, int y) coords = Helper.Translate1DTo2DCoords(move, board.GetLength(0));
             board[coords.x, coords.y] = value;
 
-            var isDraw = Helper.CheckForDraw(board);
+            var isDraw = board.CheckForDraw();
             if (isDraw) return DrawScore();
             var result = winConditions.Invoke(board, value, coords);
-            var thisPlayerIndex = 1;
-            switch (result)
-            {
-                case -1:
-                    return DrawScore();
-                case 1 when thisPlayerIndex == 1:
-                    return WinScore(depth);
-                case 1:
-                    return LoseScore(depth);
-            }
+            if (result == -1)
+                return DrawScore();
+            if (result == value)
+                return WinScore(depth);
+            if (result >= 0)
+                return LoseScore(depth);
 
             depth++;
             var availableMoves = board.GetAvailableMoves();
             var scores = new int[availableMoves.Count];
 
-            foreach (var availableMove in availableMoves)
+            for (var i = 0; i < availableMoves.Count; i++)
             {
-                var score = GetMinimaxScore(value, availableMove, board, depth, winConditions);
+                var score = GetMinimaxScore(availableValues.GetNextElementWithLoop(value), availableValues, availableMoves[i], board, depth, isMyTurn, winConditions);
+                scores[i] = score;
             }
 
-            return 0;
+            return isMyTurn.Invoke(value) ? scores.Max() : scores.Min();
         }
 
         private static int DrawScore() => 0;

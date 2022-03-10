@@ -7,7 +7,7 @@ namespace TicTacToe.Gameplay
     {
         private readonly Random _rng = new();
 
-        public int? Decide(int[,] board, int value, Func<int[,], int, (int, int), int> _)
+        public int? Decide(int[,] board, int startValue, Func<int[,], int, (int, int), int> _)
         {
             var availableIndices = board.GetAvailableMoves();
             if (availableIndices.Count == 0) return null;

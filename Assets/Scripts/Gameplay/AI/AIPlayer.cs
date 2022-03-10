@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TicTacToe.Gameplay
@@ -11,9 +10,9 @@ namespace TicTacToe.Gameplay
         private Action<Action, float> _delayedInvocation;
         private readonly Action<bool> _toggleUserInput;
 
-        public AIPlayer(AiDifficulty difficulty, Action<int> propagateInput)
+        public AIPlayer(AiDifficulty difficulty, int numberOfPlayers, Action<int> propagateInput)
         {
-            _algorithm = AssignAiDifficulty(difficulty);
+            _algorithm = AssignAiDifficulty(difficulty, numberOfPlayers);
             _propagateInput = propagateInput;
         }
 
@@ -25,13 +24,13 @@ namespace TicTacToe.Gameplay
             _propagateInput?.Invoke(output.Value);
         }
 
-        private static IDecisionAlgorithm AssignAiDifficulty(AiDifficulty difficulty)
+        private static IDecisionAlgorithm AssignAiDifficulty(AiDifficulty difficulty, int numberOfPlayers)
         {
             return difficulty switch
             {
                 AiDifficulty.Easy => new RandomChoiceAlgorithm(),
-                AiDifficulty.Medium => new MinimaxAlgorithm(2),
-                AiDifficulty.Hard => new MinimaxAlgorithm(5),
+                AiDifficulty.Medium => new MinimaxAlgorithm(2, numberOfPlayers),
+                AiDifficulty.Hard => new MinimaxAlgorithm(5, numberOfPlayers),
                 _ => new RandomChoiceAlgorithm()
             };
         }
