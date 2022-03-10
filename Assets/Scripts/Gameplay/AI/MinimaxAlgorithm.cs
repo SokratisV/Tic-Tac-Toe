@@ -7,11 +7,12 @@ namespace TicTacToe.Gameplay
     {
         private readonly int[] _availableValues;
         private readonly Random _rng = new();
-        private bool _isMediumDifficulty;
+        private readonly bool _isMediumDifficulty;
 
         public MinimaxAlgorithm(int numberOfPlayers, bool isMediumDifficulty = false)
         {
             _availableValues = new int[numberOfPlayers];
+            _isMediumDifficulty = isMediumDifficulty;
             for (var i = 0; i < numberOfPlayers; i++)
             {
                 _availableValues[i] = i;
