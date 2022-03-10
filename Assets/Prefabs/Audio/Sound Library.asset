@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ButtonClick: {fileID: 8300000, guid: 32d4b1811dda14a6cb9e059ee8ad17d2, type: 3}
   RoundEnd: {fileID: 8300000, guid: 79180f511d89441b9aa23ccae1992fe0, type: 3}
-  TileClick: {fileID: 8300000, guid: ef1cb331cd51365489e91c6bc5712575, type: 3}
-  AiMove: {fileID: 8300000, guid: 724131bc8a7f34041bb9f1701f0cb58d, type: 3}
+  TileClick: {fileID: 8300000, guid: 724131bc8a7f34041bb9f1701f0cb58d, type: 3}
+  AiMove: {fileID: 8300000, guid: ef1cb331cd51365489e91c6bc5712575, type: 3}

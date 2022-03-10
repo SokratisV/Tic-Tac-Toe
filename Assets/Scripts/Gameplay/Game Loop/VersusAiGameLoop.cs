@@ -7,7 +7,6 @@ namespace TicTacToe.Gameplay
         private readonly AIPlayer _aiPlayer;
         private readonly int _aiPlayerTurnIndex;
         private readonly Action<Action, float> _delayedInvocation;
-        private bool _isPlayerInputEnabled = true;
         private const float AIThinkDelay = 1f;
 
         public VersusAiGameLoop(GameData data, Action<Action, float> invokeMethodWithDelay) : base(data)
@@ -25,7 +24,7 @@ namespace TicTacToe.Gameplay
 
         public override void PropagateInput(int gridIndex, bool isPlayerInput = true)
         {
-            if (CheckInvalidConditions(isPlayerInput)) return;
+            if (ShouldInputBeBlocked(isPlayerInput)) return;
             _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
         }
 
@@ -35,16 +34,20 @@ namespace TicTacToe.Gameplay
             CheckForAiTurn(CurrentPlayerIndex, CurrentPlayerIndex);
         }
 
-        private bool CheckInvalidConditions(bool isPlayerInput)
+        private bool ShouldInputBeBlocked(bool isPlayerInput)
         {
-            var hasReceivedPlayerInputDuringAiTurn = isPlayerInput && CurrentPlayerIndex == _aiPlayerTurnIndex;
-            return hasReceivedPlayerInputDuringAiTurn || _isPlayerInputEnabled == false || _hasGameEnded;
+            if (isPlayerInput)
+            {
+                if (CurrentPlayerIndex == _aiPlayerTurnIndex) return true;
+            }
+            
+            return _hasGameEnded;
         }
 
         private void CheckForAiTurn(int currentPlayerIndex, int value)
         {
             if (currentPlayerIndex != _aiPlayerTurnIndex) return;
-            ToggleUserInput(false);
+            // ToggleUserInput(false);
             _delayedInvocation?.Invoke(() =>
             {
 #if ASYNC
@@ -53,10 +56,10 @@ namespace TicTacToe.Gameplay
 #else
                 _aiPlayer.MakeChoice(_board.BoardState, value, CheckForWinnerWithoutAffectingState);
 #endif
-                ToggleUserInput(true);
+                // ToggleUserInput(true);
             }, AIThinkDelay);
         }
 
-        private void ToggleUserInput(bool toggle) => _isPlayerInputEnabled = toggle;
+        // private void ToggleUserInput(bool toggle) => _isPlayerInputEnabled = toggle;
     }
 }
