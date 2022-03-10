@@ -14,7 +14,11 @@ namespace TicTacToe.Gameplay
         {
             data.NumberOfPlayers = 2;
             _delayedInvocation = invokeMethodWithDelay;
-            _aiPlayer = new AIPlayer(data.Difficulty, data.NumberOfPlayers, gridIndex => PropagateInput(gridIndex, false));
+            _aiPlayer = new AIPlayer(data.Difficulty, data.NumberOfPlayers, gridIndex =>
+            {
+                data.Audio.Play(data.Audio.Library.AiMove);
+                PropagateInput(gridIndex, false);
+            });
             _aiPlayerTurnIndex = 1;
             NextPlayer();
         }

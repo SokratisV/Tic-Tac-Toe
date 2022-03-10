@@ -8,5 +8,6 @@ namespace TicTacToe.Audio
         public AudioClip ButtonClick;
         public AudioClip RoundEnd;
         public AudioClip TileClick;
+        public AudioClip AiMove;
     }
 }
