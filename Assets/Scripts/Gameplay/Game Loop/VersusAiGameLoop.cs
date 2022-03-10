@@ -43,6 +43,7 @@ namespace TicTacToe.Gameplay
             ToggleUserInput(false);
             _delayedInvocation?.Invoke(() =>
             {
+                //TODO: restructure this to allow the async to run before the artificial "delay"
                 _aiPlayer.MakeChoice(_board.BoardState, value, CheckForWinnerWithoutAffectingState);
                 ToggleUserInput(true);
             }, AIThinkDelay);

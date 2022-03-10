@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf77805c37684edaaf5f097210a2d703, type: 3}
   m_Name: Game Data
   m_EditorClassIdentifier: 
-  NumberOfPlayers: 2
   BoardWidth: 3
   BoardHeight: 3
   WinConditions:
