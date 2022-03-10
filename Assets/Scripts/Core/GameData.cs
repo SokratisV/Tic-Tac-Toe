@@ -11,24 +11,24 @@ namespace TicTacToe
     {
         [Min(3)] public int BoardWidth = 3;
         [Min(3)] public int BoardHeight = 3;
-        [SerializeField] private WinConditionCheck[] WinConditions;
-        [SerializeField] private AudioEngine AudioEngine;
+        [SerializeField] private WinConditionCheck[] winConditions;
+        [SerializeField] private AudioEngine audioEngine;
 
         public int BoardSize => BoardWidth * BoardHeight;
         public int NumberOfPlayers { get; set; } = 2;
         public GameMode GameMode { get; set; }
         public AiDifficulty Difficulty { get; set; }
-        public AudioEngine Audio => AudioEngine;
+        public AudioEngine Audio => audioEngine;
 
         public List<Func<int, int[,], (int, int), bool>> GetWinConditions()
         {
-            List<Func<int, int[,], (int, int), bool>> winConditions = new();
-            foreach (var winConditionCheck in WinConditions)
+            List<Func<int, int[,], (int, int), bool>> conditions = new();
+            foreach (var winConditionCheck in winConditions)
             {
-                winConditions.Add(winConditionCheck.Check);
+                conditions.Add(winConditionCheck.Check);
             }
 
-            return winConditions;
+            return conditions;
         }
     }
 }
