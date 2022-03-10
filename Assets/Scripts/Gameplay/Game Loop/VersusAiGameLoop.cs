@@ -22,13 +22,13 @@ namespace TicTacToe.Gameplay
         public override void PropagateInput(int gridIndex, bool isPlayerInput = true)
         {
             if (CheckInvalidConditions(isPlayerInput)) return;
-            _board.BoardUpdate(gridIndex, CurrentPlayerIndex, _perPlayerValue[CurrentPlayerIndex]);
+            _board.BoardUpdate(gridIndex, CurrentPlayerIndex);
         }
 
         protected sealed override void NextPlayer()
         {
             base.NextPlayer();
-            CheckForAiTurn(CurrentPlayerIndex, _perPlayerValue[CurrentPlayerIndex]);
+            CheckForAiTurn(CurrentPlayerIndex, CurrentPlayerIndex);
         }
 
         private bool CheckInvalidConditions(bool isPlayerInput)
@@ -43,7 +43,7 @@ namespace TicTacToe.Gameplay
             ToggleUserInput(false);
             _delayedInvocation?.Invoke(() =>
             {
-                _aiPlayer.MakeChoice(_board.BoardState, value);
+                _aiPlayer.MakeChoice(_board.BoardState, value, CheckForWinnerWithoutAffectingState);
                 ToggleUserInput(true);
             }, AIThinkDelay);
         }

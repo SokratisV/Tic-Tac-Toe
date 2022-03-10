@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TicTacToe.Gameplay
@@ -16,10 +17,10 @@ namespace TicTacToe.Gameplay
             _propagateInput = propagateInput;
         }
 
-        public async void MakeChoice(int[,] board, int valueToCheck)
+        public async void MakeChoice(int[,] board, int valueToCheck, Func<int[,], int, (int, int), int> winConditions)
         {
             _toggleUserInput?.Invoke(false);
-            var output = await Task.Run(() => _algorithm.Decide(board, valueToCheck));
+            var output = await Task.Run(() => _algorithm.Decide(board, valueToCheck, winConditions));
             if (output == null) return;
             _propagateInput?.Invoke(output.Value);
         }

@@ -14,7 +14,6 @@ namespace TicTacToe.Gameplay
         protected readonly List<Func<int, int[,], (int, int), bool>> _winConditions;
         protected readonly Board _board;
         protected bool _hasGameEnded;
-        protected readonly int[] _perPlayerValue; //Represents an internal value for each player, instead of being bound to X,O, etc
 
         public int CurrentPlayerIndex { get; private set; } = -1;
         public int BoardWidth => _board.BoardWidth;
@@ -23,14 +22,7 @@ namespace TicTacToe.Gameplay
         {
             _numberOfPlayers = data.NumberOfPlayers;
             _winConditions = data.GetWinConditions();
-
             _board = new Board(data);
-            _perPlayerValue = new int[data.NumberOfPlayers];
-            for (var i = 0; i < data.NumberOfPlayers; i++)
-            {
-                _perPlayerValue[i] = i + 1;
-            }
-
             _board.OnBoardUpdated += CheckForWinner;
             _board.OnBoardUpdated += (_, value, coordsOfChange) => OnBoardUpdated?.Invoke(value, coordsOfChange);
         }
@@ -65,23 +57,32 @@ namespace TicTacToe.Gameplay
                 }
             }
 
-            if (CheckForDraw(board))
+            if (Helper.CheckForDraw(board))
             {
                 OnGameEnded?.Invoke(-1);
+                return;
             }
 
             NextPlayer();
         }
 
-        //Note: could be done same way as WinConditions, but that'd be an overkill
-        private static bool CheckForDraw(int[,] board)
+        //-2 = no result, -1 draw, otherwise index of player who won
+        protected int CheckForWinnerWithoutAffectingState(int[,] board, int playerRepresentingValue, (int x, int y) coords)
         {
-            foreach (var element in board)
+            foreach (var condition in _winConditions)
             {
-                if (element == 0) return false;
+                if (condition.Invoke(playerRepresentingValue, board, coords))
+                {
+                    return CurrentPlayerIndex;
+                }
             }
 
-            return true;
+            if (Helper.CheckForDraw(board))
+            {
+                return -1;
+            }
+
+            return -2;
         }
     }
 }

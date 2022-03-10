@@ -10,5 +10,16 @@
         }
 
         public static int Translate2DTo1DIndex(int x, int y, int boardWidth) => x * boardWidth + y;
+
+        //Note: could be done same way as WinConditions, but that'd be an overkill
+        public static bool CheckForDraw(int[,] board)
+        {
+            foreach (var element in board)
+            {
+                if (element == -1) return false;
+            }
+
+            return true;
+        }
     }
 }
